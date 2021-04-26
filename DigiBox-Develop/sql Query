@@ -1,0 +1,38 @@
+/*Display all airlines between India and Canada*/
+
+SELECT * From [dbo].[Airport] ap 
+JOIN [dbo].[Aircraft] ac ON ac.DepartureAirportID=ap.AirportID
+JOIN [dbo].[Airport] ap1 ON ac.ArrivalAirportID=ap1.AirportID
+WHERE (ap.Country='India' OR ap.Country='Canada') AND (ap1.Country='Canada' OR ap1.Country='India') AND NOT(ap.Country=ap1.Country)
+
+/*Display all airline name operating no aircraft */
+SELECT 
+	ar.Name,
+	ar.[IATACode],
+	Count(ac.[AircraftID]) AS [Aircraft Count]
+	From [dbo].[Airline] ar
+	INNER JOIN [dbo].[Aircraft] ac ON ar.AirlineID=ac.AirlineID
+	GROUP BY ar.Name, ar.IATACode Having Count(ac.[AircraftID]) < 2
+
+/* Display all airline name which operating less than two aircraft */
+	SELECT 
+	ar.Name,
+	ar.[IATACode],
+	Count(ac.[AircraftID]) AS [Aircraft Count]
+	From [dbo].[Airline] ar
+	LEFT JOIN [dbo].[Aircraft] ac ON ar.AirlineID=ac.AirlineID
+	GROUP BY ar.Name, ar.IATACode Having Count(ac.[AircraftID]) <2
+
+/*Display all the airline having name starting from A*/
+	SELECT 
+	ar.Name,
+	ar.[IATACode]
+	From [dbo].[Airline] ar
+	WHERE Name LIKE 'A%'
+
+/* Display airline having most aircraft*/
+SELECT 
+	MAX (ac.[AircraftID]) AS Aircraft
+	FROM [dbo].[Airline] ar
+
+  

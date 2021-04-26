@@ -1,0 +1,133 @@
+
+#Query to Create Airline Table
+CREATE TABLE `Aero`.`Airline` (
+  `AirlineID` INT NOT NULL AUTO_INCREMENT,
+  `NAME` VARCHAR(100) NOT NULL,
+  `ADDRESS` CHAR(200) NULL,
+  `IATACode` CHAR(5) NULL,
+  PRIMARY KEY (`AirlineID`));
+
+
+INSERT INTO Aero.Airline(NAME,ADDRESS,IATACode)
+VALUES ('Air India','India','AI'),
+('IndiGo','India','6E'),
+('Vistara','India','UK'),
+('SpiceJet','India','SG'),
+('Qatar Airways','India','QR'),
+('Delta Air Lines','US','DL'),
+('Lufthansa','India','LH'),
+('Air Canada','Canada','AC'),
+('JetBlue Airways','India','B6'),
+('AirAsia','India','AA');
+
+
+#Query to Create Airport Table
+CREATE TABLE `Aero`.`Airport` (
+  `AirportID` INT NOT NULL AUTO_INCREMENT,
+  `NAME` VARCHAR(250) NOT NULL,
+  `City` CHAR(200) NULL,
+  `Country` CHAR(100) NULL,
+  `IATACode` CHAR(5) NULL,
+  `Latitude` DECIMAL(20,15) NULL,
+  `Longitude` DECIMAL(20,15) NULL,
+  PRIMARY KEY (`AirportID`));
+
+  INSERT INTO Aero.Airport(NAME,City,Country,IATACode,Latitude,Longitude)
+VALUES ('Indira Gandhi International Airport','Delhi','India','DEL',28.5665,77.103104),
+('Ottawa Macdonald-Cartier International Airport','Ottawa','Canada','YOW',45.3224983,-75.6691970),
+('Frankfurt am Main Airport','Frankfurt','Germany','FRA',50.033333,8.570556),
+('Eura Airport','Eura','Finland','EFE',68.36260,23.424299),
+('London Luton Airport','London','United Kingdom','LTN',51.8746986,-0.368333011),
+('Amsterdam Airport Schiphol','Amsterdam','Netherlands','AMS',52.308601,4.76389),
+('Brisbane Archerfield Airport','Brisbane','Australia','ACF',-27.5702991486,153.007995605),
+('Beijing Capital International Airport','Beijing','China','PEK',40.08010101,116.58499908),
+('Los Angeles International Airport','Los Angeles','United States','LAX',33.94250107,-118.4079971),
+('La Guardia Airport','New York','United States','LGA',40.77719879,-73.87259674),
+('Dubai International Airport','Dubai','United Arab Emirates','DXB',25.2527999878,55.3643989563),
+('Sheremetyevo International Airport','Moscow','Russia','SVO',55.972599,37.4146),
+('Incheon International Airport','Seoul','South Korea','ICN',37.4691009,126.4509963),
+('Narita International Airport','Tokyo','Japan','NRT',35.7647018433,140.386001587),
+('Chennai International Airport','Chennai','India','MAA',12.990005493,80.169296264),
+('Chhatrapati Shivaji International Airport','Mumbai','India','BOM',19.0886993408,72.8678970337),
+('Kempegowda International Airport','Bangalore','India','BLR',13.1979,77.706299)
+
+
+#Query to Create Aircraft Table
+CREATE TABLE `Aero`.`Aircraft` (
+  `AircraftID` INT NOT NULL AUTO_INCREMENT,
+  `AirlineID` INT NOT NULL,
+  `DepartureAirportID` INT NOT NULL,
+  `DepartureTime` DATETIME NOT NULL,
+  `ArrivalAirportID` INT NOT NULL,
+  `ArrivalTime` DATETIME NOT NULL,
+  PRIMARY KEY (`AircraftID`));
+
+ALTER TABLE `Aero`.`Aircraft` 
+ADD INDEX `AirlineID_idx` (`AirlineID` ASC);
+ALTER TABLE `Aero`.`Aircraft` 
+ADD CONSTRAINT `AirlineID`
+  FOREIGN KEY (`AirlineID`)
+  REFERENCES `Aero`.`Airline` (`AirlineID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `Aero`.`Aircraft` 
+ADD INDEX `ArrivalAirportID_idx` (`ArrivalAirportID` ASC),
+ADD INDEX `DepartureAirportID_idx` (`DepartureAirportID` ASC);
+ALTER TABLE `Aero`.`Aircraft` 
+ADD CONSTRAINT `ArrivalAirportID`
+  FOREIGN KEY (`ArrivalAirportID`)
+  REFERENCES `Aero`.`Airport` (`AirportID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `DepartureAirportID`
+  FOREIGN KEY (`DepartureAirportID`)
+  REFERENCES `Aero`.`Airport` (`AirportID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+INSERT INTO Aero.Aircraft(AirlineID,DepartureAirportID,DepartureTime,ArrivalAirportID,ArrivalTime)
+VALUES (1,1,CURDATE()-3,16,CURDATE()-1),
+(1,16,CURDATE()-4,15,CURDATE()-2),
+(2,10,CURDATE()-4,16,CURDATE()-3),
+(2,9,CURDATE()-6,17,CURDATE()-4),
+(4,9,CURDATE()-2,12,CURDATE()-1),
+(6,1,CURDATE()-7,10,CURDATE()-2),
+(6,13,CURDATE()-8,12,CURDATE()-3),
+(6,13,CURDATE()-14,5,CURDATE()-4),
+(7,5,CURDATE()-4,15,CURDATE()-5),
+(7,13,CURDATE()-5,17,CURDATE()-1),
+(7,4,CURDATE()-2,2,CURDATE()-1),
+(1,11,CURDATE()-12,15,CURDATE()-3),
+(8,3,CURDATE()-10,16,CURDATE()-1),
+(8,8,CURDATE()-9,1,CURDATE()-2),
+(8,11,CURDATE()-3,13,CURDATE()+1),
+(9,10,CURDATE()+1,7,CURDATE()+4),
+(9,2,CURDATE()-1,4,CURDATE()+2),
+(9,6,CURDATE()-2,8,CURDATE()+5),
+(9,12,CURDATE()-12,9,CURDATE()-1),
+(3,7,CURDATE()-12,14,CURDATE()-1)
+
+
+#select aircraft details based on DepartureTime in descending order
+select arl.Name as AirlineName,arp.Name as AirportName,arc.AircraftID as FlightID,arc.DepartureTime as DepartTime  from Aero.Aircraft arc 
+inner join Aero.Airline arl on arc.AirlineID = arl.AirlineID
+inner join Aero.Airport arp on arc.DepartureAirportID = arp.AirportID order by  arc.DepartureTime desc;
+
+
+#select aircraft details based on ArrivalTime in ascending order
+select arl.Name as AirlineName,arpp.Name as AirportName,arc.AircraftID as FlightID,arc.ArrivalTime as ArrivalTime  from Aero.Aircraft arc 
+inner join Aero.Airline arl on arc.AirlineID = arl.AirlineID
+inner join Aero.Airport arpp on arc.ArrivalAirportID = arpp.AirportID order by  arc.ArrivalTime asc;
+
+   
+#select aircraft details based on ArrivalTime and Departure time where country is India
+select arl.Name as AirlineName,arpp.Name as AirportName,arc.AircraftID as FlightID,arc.ArrivalTime as ArrivalTime,arc.DepartureTime as DepartTime from Aero.Aircraft arc 
+inner join Aero.Airline arl on arc.AirlineID = arl.AirlineID
+inner join Aero.Airport arp on arc.DepartureAirportID = arp.AirportID 
+inner join Aero.Airport arpp on arc.ArrivalAirportID = arpp.AirportID  where arpp.Country='India';
+   
+
+
+

@@ -1,0 +1,135 @@
+﻿create table Airline(AirlineID int not null,
+name varchar(200) not null,
+address char(250),
+IATAcode char(5),
+primary key(AirlineID))
+
+
+create table Airport(AirportID int not null,
+name varchar(200) not null,
+address char(250),
+IATAcode char(5),
+latitude decimal(20,15),
+longitude decimal(20,15),
+primary key(AirportID))
+
+
+create table Aircraft(AircraftID int not null,
+AirlineID int not null,
+DepartureAirportID int not null,
+DepartureTime DateTime not null,
+ArrivalAirportID int not null,
+ArrivalTime DateTime not null,
+primary key(AircraftID),
+foreign key(AirlineID) references Airline(AirlineID),
+
+
+1)Display the data of Airlines including their Aircraft details
+
+select ar.AirlineID,
+ac.AircraftID,
+ac.DepartureAirportID,
+ac.ArrivalAirportID
+ from Airline ar 
+inner join Aircraft ac on ar.AirlineID=ac.AirlineID
+
+
+2)Display the data of all airlines including Aircraft details*/
+
+select ar.AirlineID,
+ac.AircraftID,
+ac.DepartureAirportID,
+ac.ArrivalAirportID 
+from Airline ar 
+left join Aircraft ac on ar.AirlineID=ac.AirlineID
+
+
+3)Display the data of all airlines including Aircraft details for AircraftID=1
+
+select ar.AirlineID,
+ac.AircraftID,
+ac.DepartureAirportID,
+ac.ArrivalAirportID 
+from Airline ar 
+left join Aircraft ac on ar.AirlineID=ac.AirlineID
+where ac.AircraftID=1 group by ar.AirlineID
+
+
+4) Display count of airlineids with DepartureAirportID wise and order wise
+
+ select ac.AirlineID,count(ac.DepartureAirportID)
+ from Airline ar 
+inner join Aircraft ac on ar.AirlineID=ac.AirlineID 
+order by ac.AirlineID desc
+
+
+5)Display Airport names without duplicates
+
+Select AirportID,count(Distinct name) 
+from Airport 
+group by AirportID
+
+
+
+6)Display highest  airlineids with  DepartureAirportID's
+
+WITH rank AS
+(
+	SELECT name, DepartureAirportID, TotAirlineid, RANK() OVER (ORDER BY TotAirlineid DESC) as r
+	FROM (	SELECT name, DepartureAirportID, SUM(AirlineID) AS TotAirlineid 
+			FROM Airline  GROUP BY name, DepartureAirportID) a
+)
+SELECT name, DepartureAirportID, TotAirlineid FROM rank where r = 1
+
+
+
+7)Display sum of latitude and longitude
+
+select sum(latitude),sum(longitude)
+ from  Airport 
+order by AirportID 
+
+
+8) Display lowest and highest latitude ,longitude
+
+Select min(latitude),max(latitude),min(longitude),max(longitude)
+ from Airport
+ group by AirportID
+
+
+
+9)Display duplicate rows from table
+
+Select * from Airline a1 
+where rowid 
+<( select max(rowid) from Airline a2 where a1.AirlineID=a2.AirlineID);
+
+
+
+10)Display last record from the table
+
+Select * from Aircraft 
+where Rowid= select max(Rowid) from Aircraft;
+
+
+
+11)display first 10 Records from Airline table
+
+Select * from Airline
+ where Rownum <=10;
+
+
+12)Display all records from Airport table where name not in ‘India'
+
+select * from Airport 
+where name Not  in (‘India’)
+
+13)Display all Aircraft details DepartureTime in 2020 year
+
+select * from Aircraft
+ where DepartureTime like '2020%'
+
+14)Display all Airline details  between 100 to 500
+select * from Airline
+ where AirlineID between 100 and 500
+
